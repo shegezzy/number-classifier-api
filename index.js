@@ -50,24 +50,18 @@ app.get("/api/classify-number", async (req, res) => {
 
   // Generate the properties array based on number classifications
   let properties = [];
-  const classifications = {
-    prime: isPrime(num),
-    perfect: isPerfect(num),
-    armstrong: isArmstrong(num),
-    even: num % 2 === 0,
-    odd: num % 2 !== 0
-  };
 
-  for (let [prop, isValid] of Object.entries(classifications)) {
-    if (isValid) properties.push(prop);
-  }
+  // Only include "armstrong", "odd", "even"
+  if (isArmstrong(num)) properties.push("armstrong");
+  if (num % 2 === 0) properties.push("even");
+  else properties.push("odd");
 
   // Calculate the digit sum
   const digitSum = num.toString().split("").reduce((sum, digit) => sum + parseInt(digit), 0);
 
   // Generate the fun fact dynamically for Armstrong numbers
   let funFact = null;
-  if (classifications.armstrong) {
+  if (isArmstrong(num)) {
     funFact = `${num} is an Armstrong number because ` + num
       .toString()
       .split("")
@@ -78,8 +72,6 @@ app.get("/api/classify-number", async (req, res) => {
   // Build the response dynamically
   const response = {
     number: num,
-    is_prime: classifications.prime,
-    is_perfect: classifications.perfect,
     properties: properties,
     digit_sum: digitSum,
     fun_fact: funFact || "No fact found."
