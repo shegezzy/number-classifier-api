@@ -1,5 +1,4 @@
 const express = require("express");
-const axios = require("axios");
 const cors = require("cors");
 
 const app = express();
@@ -16,7 +15,7 @@ function isPrime(n) {
 
 // Helper function to check if a number is perfect
 function isPerfect(n) {
-  if (!Number.isInteger(n)) return false; // Only whole numbers can be perfect
+  if (!Number.isInteger(n) || n <= 0) return false; // Only whole positive numbers can be perfect
   let sum = 0;
   for (let i = 1; i < n; i++) {
     if (n % i === 0) sum += i;
@@ -45,15 +44,23 @@ app.get("/api/classify-number", async (req, res) => {
   try {
     num = parseFloat(number);
   } catch (err) {
-    return res.status(400).json({ number: number, error: "Invalid input. Please provide a valid number." });
+    return res.status(400).json({ error: "Invalid input. Please provide a valid number." });
+  }
+
+  // If the number is not a valid number or is not an integer
+  if (isNaN(num)) {
+    return res.status(400).json({ error: "Invalid input. Please provide a valid number." });
   }
 
   // Generate the properties array based on number classifications
   let properties = [];
 
   // Only include "armstrong", "odd", "even"
-  if (isArmstrong(num)) properties.push("armstrong");
-  if (num % 2 === 0) properties.push("even");
+  const isArmstrongNumber = isArmstrong(num);
+  if (isArmstrongNumber) properties.push("armstrong");
+
+  const isEven = num % 2 === 0;
+  if (isEven) properties.push("even");
   else properties.push("odd");
 
   // Calculate the digit sum
@@ -61,7 +68,7 @@ app.get("/api/classify-number", async (req, res) => {
 
   // Generate the fun fact dynamically for Armstrong numbers
   let funFact = null;
-  if (isArmstrong(num)) {
+  if (isArmstrongNumber) {
     funFact = `${num} is an Armstrong number because ` + num
       .toString()
       .split("")
@@ -69,14 +76,21 @@ app.get("/api/classify-number", async (req, res) => {
       .join(" + ") + ` = ${num}`;
   }
 
+  // Classification checks
+  const isPrimeNumber = isPrime(num);
+  const isPerfectNumber = isPerfect(num);
+
   // Build the response dynamically
   const response = {
     number: num,
+    is_prime: isPrime(num), // Boolean for is_prime
+    is_perfect: isPerfect(num), // Boolean for is_perfect
     properties: properties,
     digit_sum: digitSum,
     fun_fact: funFact || "No fact found."
   };
 
+  // Return valid JSON response with a status code of 200
   return res.status(200).json(response);
 });
 
