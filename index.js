@@ -44,12 +44,12 @@ app.get("/api/classify-number", async (req, res) => {
   try {
     num = parseFloat(number);
   } catch (err) {
-    return res.status(400).json({ error: "Invalid input. Please provide a valid number." });
+    return res.status(400).json({ error: "Invalid input. Please provide a valid number.", number });
   }
 
   // If the number is not a valid number or is not an integer
   if (isNaN(num)) {
-    return res.status(400).json({ error: "Invalid input. Please provide a valid number." });
+    return res.status(400).json({ error: "Invalid input. Please provide a valid number.", number });
   }
 
   // Generate the properties array based on number classifications
@@ -64,7 +64,7 @@ app.get("/api/classify-number", async (req, res) => {
   else properties.push("odd");
 
   // Calculate the digit sum
-  const digitSum = num.toString().split("").reduce((sum, digit) => sum + parseInt(digit), 0);
+  const digitSum = Math.abs(num).toString().split("").reduce((sum, digit) => sum + parseInt(digit), 0);
 
   // Generate the fun fact dynamically for Armstrong numbers
   let funFact = null;
