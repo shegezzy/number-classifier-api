@@ -1,7 +1,6 @@
 const express = require("express");
 const axios = require("axios");
 const cors = require("cors");
-const math = require("mathjs");
 
 const app = express();
 app.use(cors()); // Enable CORS for all origins
